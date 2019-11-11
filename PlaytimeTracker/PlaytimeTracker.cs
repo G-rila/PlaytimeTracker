@@ -33,11 +33,11 @@ namespace PlaytimeTracker
 
         public void OnGameExited()
         {
-            string LBFolder = AppDomain.CurrentDomain.BaseDirectory;
-            string pluginFolder = Path.Combine(LBFolder, "Plugins");
-            Directory.CreateDirectory(pluginFolder + "\\PlaytimeTracker");
-            string subFolder = Path.Combine(pluginFolder, "PlaytimeTracker");
-            string saveFile = Path.Combine(subFolder, _GameId + ".txt");
+            //string LBFolder = AppDomain.CurrentDomain.BaseDirectory;
+            //string pluginFolder = Path.Combine(LBFolder, "Plugins");
+            //Directory.CreateDirectory(pluginFolder + "\\PlaytimeTracker");
+            //string subFolder = Path.Combine(pluginFolder, "PlaytimeTracker");
+            //string saveFile = Path.Combine(subFolder, _GameId + ".txt");
 
             _Finished = DateTime.UtcNow;
             _SessionTimePlayed = _Finished.Subtract(_Started);
