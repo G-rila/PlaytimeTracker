@@ -6,19 +6,15 @@ using System.Linq;
 
 namespace PlaytimeTracker
 {
-    public class PlaytimeTracker : IGameLaunchingPlugin, ICustomField
+    public class PlaytimeTracker : IGameLaunchingPlugin
     {
+        IGame _game;
         string _GameId;
         DateTime _Started;
         DateTime _Finished;
         TimeSpan _SessionTimePlayed;
         TimeSpan _TotalTimePlayed;
-        IGame _game;
-
-        public string GameId { get; set; }
-        public string Name { get; set; }
-        public string Value { get; set; }
-
+        
         public void OnAfterGameLaunched(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
             _game = game;
@@ -33,48 +29,54 @@ namespace PlaytimeTracker
 
         public void OnGameExited()
         {
-            //string LBFolder = AppDomain.CurrentDomain.BaseDirectory;
-            //string pluginFolder = Path.Combine(LBFolder, "Plugins");
-            //Directory.CreateDirectory(pluginFolder + "\\PlaytimeTracker");
-            //string subFolder = Path.Combine(pluginFolder, "PlaytimeTracker");
-            //string saveFile = Path.Combine(subFolder, _GameId + ".txt");
-
             _Finished = DateTime.UtcNow;
             _SessionTimePlayed = _Finished.Subtract(_Started);
 
+            string LBFolder = AppDomain.CurrentDomain.BaseDirectory;
+            string pluginFolder = Path.Combine(LBFolder, "Plugins");
+            Directory.CreateDirectory(pluginFolder + "\\PlaytimeTracker");
+            string subFolder = Path.Combine(pluginFolder, "PlaytimeTracker");
+            string saveFile = Path.Combine(subFolder, _GameId + ".txt");
+
             var existingField = _game.GetAllCustomFields().FirstOrDefault(f => f.Name.Equals("Playtime", StringComparison.OrdinalIgnoreCase));
-            
-            if (existingField != null)
+
+            if (File.Exists(saveFile))
             {
-                //not null, already exists
-                string s = existingField.Value;
+                //file exists, update
+                string s = File.ReadAllText(saveFile);
                 TimeSpan ts = TimeSpan.Parse(s);
                 _TotalTimePlayed = _SessionTimePlayed.Add(ts);
-                existingField.Value = _TotalTimePlayed.ToString();
-                PluginHelper.DataManager.Save();
+                File.WriteAllText(saveFile, _TotalTimePlayed.ToString());
+                
+                existingField.Value = FriendlyTimeOutput(_TotalTimePlayed);
             }
             else
             {
-                //null, doesn't exist, add new
-                _TotalTimePlayed = _SessionTimePlayed;
-                var field = _game.AddNewCustomField();
-                field.Name = "Playtime";
-                field.Value = _TotalTimePlayed.ToString();
-                PluginHelper.DataManager.Save();
-            }
+                //file doesn't exist, create
+                File.WriteAllText(saveFile, _SessionTimePlayed.ToString());
 
-            //if (File.Exists(saveFile))
-            //{
-            //    string s = File.ReadAllText(saveFile);
-            //    TimeSpan ts = TimeSpan.Parse(s);
-            //    _TotalTimePlayed = _SessionTimePlayed.Add(ts);
-            //    File.WriteAllText(saveFile, _TotalTimePlayed.ToString());
-            //}
-            //else
-            //{
-            //    _TotalTimePlayed = _SessionTimePlayed;
-            //    File.WriteAllText(saveFile, _TotalTimePlayed.ToString());
-            //}
+                var newField = _game.AddNewCustomField();
+                newField.Name = "Playtime";
+                newField.Value = FriendlyTimeOutput(_SessionTimePlayed);
+            }
+            PluginHelper.DataManager.Save();
+        }
+        public static string FriendlyTimeOutput(TimeSpan span)
+        {
+            string output;
+            if (span.TotalMinutes < 1.0)
+            {
+                output = String.Format("{0} seconds", span.Seconds);
+            }
+            else if (span.TotalHours < 1.0)
+            {
+                output = String.Format("{0} minutes, {1} seconds", span.Minutes, span.Seconds);
+            }
+            else // more than 1 hour
+            {
+                output = String.Format("{0} hours, {1} minutes, {2} seconds", (int)span.TotalHours, span.Minutes, span.Seconds);
+            }
+            return output;
         }
     }
 }
