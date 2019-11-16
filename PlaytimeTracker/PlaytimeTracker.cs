@@ -145,10 +145,13 @@ namespace PlaytimeTracker
             Directory.CreateDirectory(pluginFolder + "\\PlaytimeTracker");
             string subFolder = Path.Combine(pluginFolder, "PlaytimeTracker");
             string saveFile = Path.Combine(subFolder, selectedGame.Title + "." + selectedGame.Id + ".txt");
-            if (File.Exists(saveFile))
+            string oldSaveFile = Path.Combine(subFolder, selectedGame.Id + ".txt");
+
+            if (File.Exists(oldSaveFile))
             {
-                File.WriteAllText(saveFile, "0:00:00:00");
+                File.Delete(oldSaveFile);
             }
+            File.WriteAllText(saveFile, "0:00:00:00");
         }
 
         public void OnSelected(IGame[] selectedGames)
