@@ -46,8 +46,8 @@ namespace PlaytimeTracker
             string pluginFolder = Path.Combine(LBFolder, "Plugins");
             Directory.CreateDirectory(pluginFolder + "\\PlaytimeTracker");
             string subFolder = Path.Combine(pluginFolder, "PlaytimeTracker");
-            string saveFile = Path.Combine(subFolder, _game.Title + "." + _GameId + ".txt");
-            string oldSaveFile = Path.Combine(subFolder, _GameId + ".txt");
+            string oldSaveFile = Path.Combine(subFolder, _game.Title + "." + _GameId + ".txt");
+            string saveFile = Path.Combine(subFolder, _GameId + ".txt");
 
             //check to see if the Playtime custom field already exists
             var existingField = _game.GetAllCustomFields().FirstOrDefault(f => f.Name.Equals("Playtime", StringComparison.OrdinalIgnoreCase));
@@ -101,6 +101,7 @@ namespace PlaytimeTracker
         }
         public static string FriendlyTimeOutput(TimeSpan span)
         {
+            //without days
             string output;
             if (span.TotalMinutes < 1.0)
             {
@@ -110,11 +111,31 @@ namespace PlaytimeTracker
             {
                 output = String.Format("{0} minutes, {1} seconds", span.Minutes, span.Seconds);
             }
-            else // more than 1 hour
+            else
             {
                 output = String.Format("{0} hours, {1} minutes, {2} seconds", (int)span.TotalHours, span.Minutes, span.Seconds);
             }
             return output;
+
+            //with days
+            //string output;
+            //if (span.TotalMinutes < 1.0)
+            //{
+            //    output = String.Format("{0} seconds", span.Seconds);
+            //}
+            //else if (span.TotalHours < 1.0)
+            //{
+            //    output = String.Format("{0} minutes, {1} seconds", span.Minutes, span.Seconds);
+            //}
+            //else if (span.TotalDays < 1.0)
+            //{
+            //    output = String.Format("{0} hours, {1} minutes, {2} seconds", (int)span.TotalHours, span.Minutes, span.Seconds);
+            //}
+            //else
+            //{
+            //    output = String.Format("{0} days, {1} hours, {2} minutes, {3} seconds", span.Days, span.Hours, span.Minutes, span.Seconds);
+            //}
+            //return output;
         }
 
         public bool GetIsValidForGame(IGame selectedGame)
@@ -144,8 +165,8 @@ namespace PlaytimeTracker
             string pluginFolder = Path.Combine(LBFolder, "Plugins");
             Directory.CreateDirectory(pluginFolder + "\\PlaytimeTracker");
             string subFolder = Path.Combine(pluginFolder, "PlaytimeTracker");
-            string saveFile = Path.Combine(subFolder, selectedGame.Title + "." + selectedGame.Id + ".txt");
-            string oldSaveFile = Path.Combine(subFolder, selectedGame.Id + ".txt");
+            string oldSaveFile = Path.Combine(subFolder, selectedGame.Title + "." + selectedGame.Id + ".txt");
+            string saveFile = Path.Combine(subFolder, selectedGame.Id + ".txt");
 
             if (File.Exists(oldSaveFile))
             {
