@@ -3,6 +3,9 @@ using System.IO;
 using Unbroken.LaunchBox.Plugins;
 using Unbroken.LaunchBox.Plugins.Data;
 using System.Linq;
+using System.Drawing;
+using System.Windows.Media.Imaging;
+using System.Reflection;
 
 namespace PlaytimeTracker
 {
@@ -19,7 +22,7 @@ namespace PlaytimeTracker
 
         public string Caption => "Reset Playtime";
 
-        public System.Drawing.Image IconImage => Properties.Resources.clock;
+        public System.Drawing.Image IconImage => Properties.Resources.reset;
 
         public bool ShowInLaunchBox => true;
 
@@ -34,7 +37,7 @@ namespace PlaytimeTracker
 
         public void OnBeforeGameLaunching(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
-            throw new NotImplementedException();
+            return;
         }
 
         public void OnGameExited()
@@ -80,6 +83,7 @@ namespace PlaytimeTracker
                     newField.Name = "Playtime";
                     newField.Value = FriendlyTimeOutput(_TotalTimePlayed);
                 }
+                PluginHelper.DataManager.Save();
             }
             else
             {
@@ -96,8 +100,8 @@ namespace PlaytimeTracker
                     newField.Name = "Playtime";
                     newField.Value = FriendlyTimeOutput(_SessionTimePlayed);
                 }
+                PluginHelper.DataManager.Save();
             }
-            PluginHelper.DataManager.Save();
         }
         public static string FriendlyTimeOutput(TimeSpan span)
         {
@@ -160,6 +164,7 @@ namespace PlaytimeTracker
         {
             var existingField = selectedGame.GetAllCustomFields().FirstOrDefault(f => f.Name.Equals("Playtime", StringComparison.OrdinalIgnoreCase));
             existingField.Value = "";
+            PluginHelper.DataManager.Save();
 
             string LBFolder = AppDomain.CurrentDomain.BaseDirectory;
             string pluginFolder = Path.Combine(LBFolder, "Plugins");
@@ -173,6 +178,68 @@ namespace PlaytimeTracker
                 File.Delete(oldSaveFile);
             }
             File.WriteAllText(saveFile, "0:00:00:00");
+        }
+
+        public void OnSelected(IGame[] selectedGames)
+        {
+            return;
+        }
+    }
+    public partial class PlaytimeSetter : IGameMenuItemPlugin
+    {
+        public bool SupportsMultipleGames => false;
+
+        public string Caption => "Set Playtime";
+
+        public Image IconImage => Properties.Resources.set;
+
+        public bool ShowInLaunchBox => true;
+
+        public bool ShowInBigBox => false;
+
+        public bool GetIsValidForGame(IGame selectedGame)
+        {
+            return true;
+        }
+
+        public bool GetIsValidForGames(IGame[] selectedGames)
+        {
+            return false;
+        }
+
+        public void OnSelected(IGame selectedGame)
+        {
+            string LBFolder = AppDomain.CurrentDomain.BaseDirectory;
+            string pluginFolder = Path.Combine(LBFolder, "Plugins");
+            Directory.CreateDirectory(pluginFolder + "\\PlaytimeTracker");
+            string subFolder = Path.Combine(pluginFolder, "PlaytimeTracker");
+            string oldSaveFile = Path.Combine(subFolder, selectedGame.Title + "." + selectedGame.Id + ".txt");
+            string saveFile = Path.Combine(subFolder, selectedGame.Id + ".txt");
+
+            var existingField = selectedGame.GetAllCustomFields().FirstOrDefault(f => f.Name.Equals("Playtime", StringComparison.OrdinalIgnoreCase));
+
+            //WPF window for entering playtime
+            PlaytimeSetter ps = new PlaytimeSetter();
+            ps._setGame = selectedGame;
+            ps._sExistingField = existingField;
+            ps.sGameTitle.Text = selectedGame.Title;
+
+            if (existingField != null)
+            {
+                if (existingField.Value != "")
+                {
+                    ps.sPreviousPlaytime.Text = existingField.Value;
+                }
+                else
+                {
+                    ps.sPreviousPlaytime.Text = "N/A";
+                }
+            }
+            else
+            {
+                ps.sPreviousPlaytime.Text = "N/A";
+            }
+            ps.ShowDialog();
         }
 
         public void OnSelected(IGame[] selectedGames)

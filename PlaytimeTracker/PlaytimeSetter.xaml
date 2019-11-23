@@ -1,0 +1,29 @@
+﻿<Window x:Class="PlaytimeTracker.PlaytimeSetter"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PlaytimeTracker"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             Height="340" Width="420" ShowInTaskbar="True" Title="Set Playtime" WindowStartupLocation="CenterScreen" SizeToContent="Height">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            
+        </Grid.RowDefinitions>
+        <DockPanel LastChildFill="False">
+            <TextBlock DockPanel.Dock="Top" Name="sGameTitle" Foreground="#222222" FontSize="24" FontWeight="Bold" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="10,0" TextAlignment="Center"/>
+            <TextBlock DockPanel.Dock="Top" Name="sPreviousPlaytimeLabel" Text="Previous Playtime:" Foreground="#222222" FontSize="18" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="10"/>
+            <TextBlock DockPanel.Dock="Top" Name="sPreviousPlaytime" Foreground="#222222" FontSize="18" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="10"/>
+            <TextBlock DockPanel.Dock="Top" Name="sInstructionsLabel" Text="Enter your game's playtime in the format of Hours:Minutes:Seconds" Foreground="#222222" FontSize="18" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="10" TextAlignment="Center"/>
+            <xctk:TimeSpanUpDown x:Name="sTimesetter" DockPanel.Dock="Top" Foreground="#222222" Width="150" Margin="10" IsReadOnly="False" Watermark="00:00:00" Maximum="1000.00:00:00" Minimum="0.00:00:00" DefaultValue="00:00:00" DisplayDefaultValueOnEmptyText="True" ClipValueToMinMax="True" ShowSeconds="True" FractionalSecondsDigitsCount="0" CurrentDateTimePart="Hour24" Step="1" FontSize="18" ShowDays="False" MouseWheelActiveTrigger="MouseOver"/>
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" Margin="10" HorizontalAlignment="Right">
+                <Button x:Name="sCancelButton" Content="Cancel" FontSize="18" Margin="0,0,20,0" Width="75" Click="SCancelButton_Click"/>
+                <Button x:Name="sSaveButton" Content="Save" FontSize="18" Width="75" Click="SSaveButton_Click"/>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>
