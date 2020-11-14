@@ -26,7 +26,7 @@ namespace PlaytimeTracker
 
         public bool ShowInLaunchBox => true;
 
-        public bool ShowInBigBox => true;
+        public bool ShowInBigBox => false;
 
         public void OnAfterGameLaunched(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
